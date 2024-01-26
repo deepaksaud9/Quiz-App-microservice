@@ -2,9 +2,11 @@ package com.deep.quizservice.service;
 
 import com.deep.quizservice.dao.QuizDao;
 import com.deep.quizservice.exception.NotFoundException;
+import com.deep.quizservice.feign.QuizFeignInterface;
 import com.deep.quizservice.model.Quiz;
 import com.deep.quizservice.pojo.QuestionPojo;
 import com.deep.quizservice.pojo.Response;
+import com.netflix.discovery.converters.Auto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -17,17 +19,19 @@ public class QuizService {
     @Autowired
     private QuizDao quizDao;
 
-    public Quiz createQuiz(String category, int numQ, String title) {
+    @Autowired
+    QuizFeignInterface quizInterface;
 
-        List<Integer> questions = questionDao.findRandomQuestionsByCategory(category,numQ);
-        if (questions.isEmpty()){
-            throw new NotFoundException("Questions not available in the database");
-        }
+    public Quiz createQuiz( String title, String category, int numQ) {
+
+        List<Integer> questions = quizInterface.getQuestionForQuiz(category,numQ).getBody();
 
         Quiz quiz = new Quiz();
         quiz.setTitle(title);
-        quiz.setQuestions(questions);
+        quiz.setQuestionsIds(questions);
+
         Quiz savedQuiz = quizDao.save(quiz);
+
 
         return savedQuiz;
     }
@@ -43,45 +47,16 @@ public class QuizService {
         return quiz;
     }
 
-    public List<QuestionPojo> setQuizQuestions(Integer id){
+    public List<QuestionPojo> getQuizQuestions(Integer id){
 
-//        Optional<Quiz> quiz = quizDao.findById(id);
-//        if (quiz.isEmpty()){
-//            throw new NotFoundException("Quiz not found");
-//        }
-//        List<Question> questionsFromDB = quiz.get().getQuestions();
-//
-        List<QuestionPojo> questionsForUsers = new ArrayList<>();
-//
-//        for (Question q : questionsFromDB){
-//            QuestionPojo qPojo = new QuestionPojo();
-//            qPojo.setId(q.getId());
-//            qPojo.setQuestionTitle(q.getQuestionTitle());
-//            qPojo.setOption1(q.getOption1());
-//            qPojo.setOption2(q.getOption2());
-//            qPojo.setOption3(q.getOption3());
-//            qPojo.setOption4(q.getOption4());
-//
-//            questionsForUsers.add(qPojo);
-//        }
-        return questionsForUsers;
+        Quiz quiz = quizDao.findById(id).get();
+        List<Integer> questionIds = quiz.getQuestionsIds();
+        List<QuestionPojo> questions = quizInterface.getQuestionsById(questionIds).getBody();
+        return questions;
     }
 
     public Integer calculateResult(int id, List<Response> responses) {
-//        Optional<Quiz> quiz = quizDao.findById(id);
-//        if (quiz.isEmpty()){
-//            throw new NotFoundException("Quiz not found");
-//        }
-//        List<Question> questions = quiz.get().getQuestions();
-//
-        int score=0;
-//        int i=0;
-//        for(Response response : responses){
-//
-//            if (response.getAnswers().equals(questions.get(i).getCorrectAnswer()))
-//                score++;
-//            i++;
-//        }
+        Integer score = quizInterface.getScore(responses).getBody();
         return score;
 
     }

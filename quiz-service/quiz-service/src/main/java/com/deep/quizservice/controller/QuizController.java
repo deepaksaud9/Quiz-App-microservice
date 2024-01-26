@@ -26,12 +26,12 @@ public class QuizController {
     public ResponseEntity<Quiz> createQuiz(@RequestBody QuizDto quizDto){
         System.out.println("I am creat Quiz method (debugging) ");
 
-        Quiz quiz = quizService.createQuiz(quizDto.getCategory(),quizDto.getNumberOfQuestion(), quizDto.getTitle());
-
-        return new ResponseEntity<Quiz>(quiz, HttpStatus.OK);
+        Quiz quiz = quizService.createQuiz(quizDto.getTitle(),quizDto.getCategory(),quizDto.getNumberOfQuestion());
+        System.out.println(quiz);
+        return new ResponseEntity<Quiz>( quiz, HttpStatus.OK);
     }
 
-    @GetMapping("/get-quiz-details/{id}")
+    @GetMapping("/getQuizById/{id}")
     public ResponseEntity<Quiz> getQuizDetailsById(@PathVariable int id){
 
         Quiz quiz = quizService.getQuizById(id);
@@ -40,7 +40,7 @@ public class QuizController {
 
     }
 
-    @GetMapping("/get-quiz/{id}")
+    @GetMapping("/getQuizQuestions/{id}")
     public ResponseEntity<List<QuestionPojo>> getQuizById(@PathVariable int id){
 
         List<QuestionPojo> quiz = quizService.getQuizQuestions(id);
@@ -48,7 +48,6 @@ public class QuizController {
         return new ResponseEntity<>(quiz, HttpStatus.OK);
 
     }
-
     @PostMapping("/submit-answer/{id}")
     public ResponseEntity<Integer> submitQuiz(@PathVariable int id, @RequestBody List<Response> responses){
 

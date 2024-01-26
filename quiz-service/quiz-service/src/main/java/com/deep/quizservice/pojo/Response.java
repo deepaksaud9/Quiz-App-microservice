@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Response {
+
     private int id;
     private String answers;
 
