@@ -23,7 +23,7 @@ public class QuizService {
     QuizFeignInterface quizInterface;
 
     public Quiz createQuiz( String title, String category, int numQ) {
-
+        System.out.println("create Quiz called");
         List<Integer> questions = quizInterface.getQuestionForQuiz(category,numQ).getBody();
 
         Quiz quiz = new Quiz();
@@ -51,6 +51,7 @@ public class QuizService {
 
         Quiz quiz = quizDao.findById(id).get();
         List<Integer> questionIds = quiz.getQuestionsIds();
+
         List<QuestionPojo> questions = quizInterface.getQuestionsById(questionIds).getBody();
         return questions;
     }
