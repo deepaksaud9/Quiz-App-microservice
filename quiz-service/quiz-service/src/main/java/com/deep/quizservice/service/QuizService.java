@@ -23,7 +23,7 @@ public class QuizService {
     QuizFeignInterface quizInterface;
 
     public Quiz createQuiz( String title, String category, int numQ) {
-        System.out.println("create Quiz called");
+//        System.out.println("create Quiz called");
         List<Integer> questions = quizInterface.getQuestionForQuiz(category,numQ).getBody();
 
         Quiz quiz = new Quiz();
